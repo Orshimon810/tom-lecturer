@@ -14,6 +14,7 @@ const CodeBlock = () => {
   const navigate = useNavigate();
   const [role, setRole] = useState('student');
   const [code, setCode] = useState('');
+  const [studentCount, setStudentCount] = useState(0);
   const socketRef = React.useRef(null);
 
   useEffect(() => {
@@ -36,6 +37,11 @@ const CodeBlock = () => {
     // Receive the latest code when joining
     socket.on('codeUpdate', (newCode) => {
       setCode(newCode);
+    });
+
+    // Update the student count
+    socket.on('updateStudentCount', (count) => {
+      setStudentCount(count);
     });
 
     socket.on('mentorLeft', () => {
@@ -72,6 +78,7 @@ const CodeBlock = () => {
     <div>
       <h1>Code Block {id}</h1>
       <p>Role: {role}</p>
+      <p>Students in the room: {studentCount}</p>
       <AceEditor
         mode="javascript"
         theme="monokai"

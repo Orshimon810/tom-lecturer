@@ -24,6 +24,7 @@ const io = new Server(server, {
 
 let mentors = {}; // Track mentors by code block ID
 let codeBlocks = {}; // Track the current code state by code block ID
+let studentCounts = {}; // Track the number of students in each code block
 
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
@@ -35,8 +36,10 @@ io.on('connection', (socket) => {
     if (!mentors[codeBlockId]) {
       mentors[codeBlockId] = socket.id;
       role = 'mentor';
+      studentCounts[codeBlockId] = 0; // Initialize student count for the block
     } else {
       role = 'student';
+      studentCounts[codeBlockId] = (studentCounts[codeBlockId] || 0) + 1;
     }
 
     // Send the role to the client
@@ -49,6 +52,9 @@ io.on('connection', (socket) => {
     if (codeBlocks[codeBlockId]) {
       socket.emit('codeUpdate', codeBlocks[codeBlockId]);
     }
+
+    // Broadcast the updated student count to all users in the block
+    io.to(codeBlockId).emit('updateStudentCount', studentCounts[codeBlockId]);
 
     socket.on('codeChange', (data) => {
       // Store the latest code in the codeBlocks object
@@ -65,6 +71,10 @@ io.on('connection', (socket) => {
       if (mentors[codeBlockId] === socket.id) {
         delete mentors[codeBlockId];
         io.to(codeBlockId).emit('mentorLeft');
+      } else {
+        // Decrease the student count
+        studentCounts[codeBlockId] = Math.max(0, (studentCounts[codeBlockId] || 1) - 1);
+        io.to(codeBlockId).emit('updateStudentCount', studentCounts[codeBlockId]);
       }
     });
   });
