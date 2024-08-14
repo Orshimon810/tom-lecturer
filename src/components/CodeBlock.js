@@ -1,40 +1,64 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AceEditor from 'react-ace';
-import ace from 'ace-builds/src-noconflict/ace'; // Import Ace core
-import 'ace-builds/src-noconflict/mode-javascript'; // Import JavaScript mode
-import 'ace-builds/src-noconflict/theme-monokai'; // Import Monokai theme
-import 'ace-builds/webpack-resolver'; // This helps resolve Ace modules
+import ace from 'ace-builds/src-noconflict/ace';
+import 'ace-builds/src-noconflict/mode-javascript';
+import 'ace-builds/src-noconflict/theme-monokai';
+import 'ace-builds/webpack-resolver';
+import { io } from 'socket.io-client';
 
-// Configure Ace to use the custom worker URL
 ace.config.setModuleUrl('ace/mode/javascript_worker', '/worker-javascript.js');
 
 const CodeBlock = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [role, setRole] = useState('student'); // Default role is student
+  const [role, setRole] = useState('student');
   const [code, setCode] = useState('');
+  const socketRef = React.useRef(null);
 
   useEffect(() => {
-    // Simulate fetching code block data from a server
-    const fetchCodeBlock = () => {
-      const initialCode = `// This is the code block for ID: ${id}\nfunction example() {\n  console.log('Hello, world!');\n}`;
-      setCode(initialCode);
+    const socket = io('http://localhost:3001', {
+      reconnectionAttempts: 5,
+      timeout: 20000,
+    });
 
-      // Assume the first visitor is Tom, so they are the mentor
-      if (!localStorage.getItem(`mentor_${id}`)) {
-        localStorage.setItem(`mentor_${id}`, 'Tom');
-        setRole('mentor');
-      } else {
-        setRole('student');
-      }
+    socketRef.current = socket;
+
+    // Join the specific code block
+    socket.emit('joinCodeBlock', id);
+
+    // Receive the role assigned by the server
+    socket.on('roleAssigned', (assignedRole) => {
+      setRole(assignedRole);
+      console.log(`Assigned role: ${assignedRole} for code block ${id}`);
+    });
+
+    // Receive the latest code when joining
+    socket.on('codeUpdate', (newCode) => {
+      setCode(newCode);
+    });
+
+    socket.on('mentorLeft', () => {
+      alert('The mentor has left the session. Redirecting to the lobby.');
+      navigate('/');
+    });
+
+    socket.on('connect', () => {
+      console.log('Connected to server');
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from server');
+    });
+
+    return () => {
+      socket.disconnect();
     };
-
-    fetchCodeBlock();
-  }, [id]);
+  }, [id, navigate]);
 
   const handleCodeChange = (newCode) => {
     setCode(newCode);
+    socketRef.current.emit('codeChange', newCode); // Emit the code change to the server
   };
 
   const handleLeavePage = () => {
