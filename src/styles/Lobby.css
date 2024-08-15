@@ -11,18 +11,34 @@ body {
 }
 
 .lobby-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
+  text-align: center;
+  padding: 50px;
 }
 
 .lobby-header {
   font-size: 3rem;
-  margin-bottom: 50px;
-  color: #222;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 40px;
 }
+
+.lobby-button {
+  background-color: #2ecc71;
+  color: white;
+  padding: 15px 25px;
+  font-size: 1.5rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  margin: 10px 0;
+  width: 200px;
+  transition: background-color 0.3s;
+}
+
+.lobby-button:hover {
+  background-color: #27ae60;
+}
+
 
 .code-block-list {
   list-style-type: none;
@@ -58,3 +74,5 @@ body {
   transform: translateY(0);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+
