@@ -1,0 +1,50 @@
+/* src/styles/CodeBlock.css */
+
+.codeblock-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .codeblock-header {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .codeblock-role {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+  
+  .codeblock-editor {
+    width: 100%;
+    max-width: 1000px;
+    margin-bottom: 20px;
+  }
+  
+  .smiley {
+    font-size: 100px;
+    color: green;
+    margin-bottom: 20px;
+  }
+
+.leave-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  font-size: 1.5rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: background-color 0.3s;
+}
+
+.leave-button:hover {
+  background-color: #45a049;
+}
+
+.leave-button:focus {
+  outline: none;
+}

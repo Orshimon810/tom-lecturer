@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AceEditor from 'react-ace';
 import ace from 'ace-builds/src-noconflict/ace';
@@ -6,18 +6,20 @@ import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/webpack-resolver';
 import { io } from 'socket.io-client';
-import debounce from 'lodash/debounce'; // Import debounce from lodash
+import debounce from 'lodash/debounce';
+import '../styles/CodeBlock.css';
 
 ace.config.setModuleUrl('ace/mode/javascript_worker', '/worker-javascript.js');
 
 const CodeBlock = () => {
-  const { id } = useParams(); // Get the blockId from the URL parameters
+  const { id } = useParams();
   const navigate = useNavigate();
-  const [role, setRole] = useState('student'); // Default role is student
-  const [code, setCode] = useState(''); // The code displayed in the editor
-  const [studentCount, setStudentCount] = useState(0); // Track the number of students
-  const [showSmiley, setShowSmiley] = useState(false); // Show smiley when code matches the solution
-  const socketRef = React.useRef(null); // Store the socket connection
+  const [role, setRole] = useState('student');
+  const [code, setCode] = useState('');
+  const [blockName, setBlockName] = useState(''); // New state for block name
+  const [studentCount, setStudentCount] = useState(0);
+  const [showSmiley, setShowSmiley] = useState(false);
+  const socketRef = React.useRef(null);
 
   useEffect(() => {
     const socket = io('http://localhost:3001', {
@@ -37,11 +39,14 @@ const CodeBlock = () => {
       setCode(newCode);
     });
 
+    socket.on('blockNameUpdate', (name) => {
+      setBlockName(name); // Update block name when received
+    });
+
     socket.on('updateStudentCount', (count) => {
       setStudentCount(count);
     });
 
-    // Listen for the solutionMatched event
     socket.on('solutionMatched', () => {
       setShowSmiley(true);
     });
@@ -56,12 +61,11 @@ const CodeBlock = () => {
     };
   }, [id, navigate]);
 
-  // Handle code changes with debouncing
-  const handleCodeChange = useCallback(debounce((newCode) => {
+  const handleCodeChange = debounce((newCode) => {
     setCode(newCode);
-    setShowSmiley(false); // Hide the smiley face if the code changes
+    setShowSmiley(false);
     socketRef.current.emit('codeChange', newCode);
-  }, 300), []); // Adjust the debounce delay (in ms) as necessary
+  }, 300);
 
   const handleLeavePage = () => {
     if (role === 'mentor') {
@@ -71,23 +75,24 @@ const CodeBlock = () => {
   };
 
   return (
-    <div>
-      <h1>Code Block {id}</h1>
-      <p>Role: {role}</p>
+    <div className="codeblock-container">
+      <h1 className="codeblock-header">Code Block: {blockName}</h1> {/* Display the block name */}
+      <p className="codeblock-role">Role: {role}</p>
       <p>Students in the room: {studentCount}</p>
-      {showSmiley && <div style={{ fontSize: '100px', color: 'green' }}>😊</div>}
+      {showSmiley && <div className="smiley">😊</div>}
       <AceEditor
         mode="javascript"
         theme="monokai"
         value={code}
         onChange={handleCodeChange}
-        readOnly={role === 'mentor'} // Make the code read-only for the mentor
+        readOnly={role === 'mentor'}
         name="code-editor"
         editorProps={{ $blockScrolling: true }}
         width="100%"
         height="400px"
+        className="codeblock-editor"
       />
-      <button onClick={handleLeavePage}>Leave</button>
+       <button className="leave-button" onClick={handleLeavePage}>Leave</button>
     </div>
   );
 };
