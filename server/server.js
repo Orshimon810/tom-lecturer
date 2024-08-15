@@ -70,23 +70,25 @@ io.on('connection', (socket) => {
     io.to(codeBlockId).emit('updateStudentCount', studentCounts[codeBlockId]);
 
     socket.on('codeChange', async (newCode) => {
-      await CodeBlock.updateOne({ blockId: codeBlockId }, { code: newCode });
-
-      console.log('newCode:', newCode);
-      console.log('solution:', codeBlock.solution);
-
-      const normalizedNewCode = newCode.replace(/\s+/g, ' ').trim();
-      const normalizedSolution = codeBlock.solution.replace(/\s+/g, ' ').trim();
-
-      if (normalizedNewCode === normalizedSolution) {
-        console.log('Solution matched!');
-        io.to(codeBlockId).emit('solutionMatched');
-      } else {
-        console.log('No match yet.');
-      }
-
-      io.to(codeBlockId).emit('codeUpdate', newCode);
-    });
+        await CodeBlock.updateOne({ blockId: codeBlockId }, { code: newCode });
+      
+        // Normalize both newCode and solution by removing all spaces and converting to lowercase
+        const normalizedNewCode = newCode.replace(/\s+/g, '').toLowerCase();
+        const normalizedSolution = codeBlock.solution.replace(/\s+/g, '').toLowerCase();
+      
+        console.log('Normalized newCode:', normalizedNewCode);
+        console.log('Normalized solution:', normalizedSolution);
+      
+        if (normalizedNewCode === normalizedSolution) {
+          console.log('Solution matched!');
+          io.to(codeBlockId).emit('solutionMatched');
+        } else {
+          console.log('No match yet.');
+        }
+      
+        io.to(codeBlockId).emit('codeUpdate', newCode);
+      });
+      
 
     socket.on('disconnect', async () => {
       console.log('A user disconnected:', socket.id);
