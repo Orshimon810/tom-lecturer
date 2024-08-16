@@ -26,15 +26,15 @@ mongoose.connect(process.env.MONGO_URI)
     console.error('Failed to connect to MongoDB Atlas:', err);
   });
 
-const io = new Server(server, {
-  cors: {
-    origin: 'http://localhost:3000',
-    methods: ['GET', 'POST'],
-    credentials: true,
-  },
-  transports: ['websocket', 'polling'],
-  allowEIO3: true,
-});
+  const io = new Server(server, {
+    cors: {
+      origin: 'https://tom-lecturer.vercel.app', // Replace with your Vercel domain
+      methods: ['GET', 'POST'],
+      credentials: true,
+    },
+    transports: ['websocket', 'polling'],
+    allowEIO3: true,
+  });
 
 let mentors = {}; // Track mentors by code block ID
 let studentCounts = {}; // Track the number of students in each code block
