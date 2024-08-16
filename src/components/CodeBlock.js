@@ -22,7 +22,7 @@ const CodeBlock = () => {
   const socketRef = React.useRef(null);
 
   useEffect(() => {
-    const socket = io('http://localhost:3001', {
+    const socket = io('http://tom-lecturer-production.up.railway.app/', {
       reconnectionAttempts: 5,
       timeout: 20000,
     });

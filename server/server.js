@@ -10,7 +10,7 @@ const app = express();
 const server = http.createServer(app);
 
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'https://tom-lecturer.vercel.app',
   methods: ['GET', 'POST'],
   credentials: true,
 }));
