@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/Lobby.css'; // Import the Lobby styles
+import '../styles/Lobby.css'; 
 
 const Lobby = () => {
   const navigate = useNavigate();
@@ -9,7 +9,7 @@ const Lobby = () => {
   useEffect(() => {
     const fetchCodeBlocks = async () => {
       try {
-        const response = await fetch('https://jslecturer-639a06a0d162.herokuapp.com/api/codeblocks');
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}api/codeblocks`);
         const data = await response.json();
         setCodeBlocks(data);
       } catch (error) {

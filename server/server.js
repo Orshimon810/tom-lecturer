@@ -8,9 +8,10 @@ const CodeBlock = require('./models/CodeBlock');
 
 const app = express();
 const server = http.createServer(app);
+const port = process.env.PORT || 3001;
 
 app.use(cors({
-  origin: 'https://jslecturer-639a06a0d162.herokuapp.com',
+  origin: `${process.env.REACT_APP_BACKEND_URL}`,
   methods: ['GET', 'POST'],
   credentials: true,
 }));
@@ -26,7 +27,7 @@ mongoose.connect(process.env.MONGO_URI)
 
   const io = new Server(server, {
     cors: {
-      origin: 'https://jslecturer-639a06a0d162.herokuapp.com', // Replace with your Vercel domain
+      origin: `${process.env.REACT_APP_BACKEND_URL}`, 
       methods: ['GET', 'POST'],
       credentials: true,
     },
@@ -122,6 +123,6 @@ app.get('/api/codeblocks', async (req, res) => {
   }
 });
 
-server.listen(3001, () => {
+server.listen(port, () => {
   console.log('Server is running on port 3001');
 });

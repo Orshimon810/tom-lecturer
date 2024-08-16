@@ -22,7 +22,7 @@ const CodeBlock = () => {
   const socketRef = React.useRef(null);
 
   useEffect(() => {
-    const socket = io('https://jslecturer-639a06a0d162.herokuapp.com/', {
+    const socket = io(`${process.env.REACT_APP_BACKEND_URL}`, {
       reconnectionAttempts: 5,
       timeout: 20000,
     });
