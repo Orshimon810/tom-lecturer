@@ -15,7 +15,10 @@ app.use(cors({
   credentials: true,
 }));
 
-mongoose.connect('mongodb+srv://orshimondev:mPuSOoRvhMOeNwAQ@jslecturer.isjqr.mongodb.net/jslecturer?retryWrites=true&w=majority')
+// Log the MongoDB URI to check if it's loaded correctly
+console.log("MongoDB URI:", process.env.MONGO_URI);
+
+mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
     console.log('Connected to MongoDB Atlas');
   })
