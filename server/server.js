@@ -142,6 +142,7 @@ app.get('/api/codeblocks', async (req, res) => {
 });
 
 // Start server
+const PORT = process.env.PORT || 8080;
 server.listen(3001, () => {
   console.log('Server is running on port 3001');
 });
