@@ -9,30 +9,13 @@ const CodeBlock = require('./models/CodeBlock');
 const app = express();
 const server = http.createServer(app);
 
-// Manually setting CORS headers
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', 'https://tom-lecturer.vercel.app'); // Allow Vercel domain
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
-  next();
-});
-
-// Setup CORS
 app.use(cors({
-  origin: 'https://tom-lecturer.vercel.app', // Vercel frontend URL
+  origin: 'https://jslecturer-639a06a0d162.herokuapp.com',
   methods: ['GET', 'POST'],
   credentials: true,
 }));
 
-// Log MongoDB URI to verify it's loaded correctly
-console.log("MongoDB URI:", process.env.MONGO_URI);
 
-// Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
     console.log('Connected to MongoDB Atlas');
@@ -41,16 +24,15 @@ mongoose.connect(process.env.MONGO_URI)
     console.error('Failed to connect to MongoDB Atlas:', err);
   });
 
-// Setup Socket.IO with CORS support
-const io = new Server(server, {
-  cors: {
-    origin: 'https://tom-lecturer.vercel.app', // Vercel frontend URL
-    methods: ['GET', 'POST'],
-    credentials: true,
-  },
-  transports: ['websocket', 'polling'],
-  allowEIO3: true,
-});
+  const io = new Server(server, {
+    cors: {
+      origin: 'https://jslecturer-639a06a0d162.herokuapp.com', // Replace with your Vercel domain
+      methods: ['GET', 'POST'],
+      credentials: true,
+    },
+    transports: ['websocket', 'polling'],
+    allowEIO3: true,
+  });
 
 let mentors = {}; // Track mentors by code block ID
 let studentCounts = {}; // Track the number of students in each code block
@@ -89,25 +71,25 @@ io.on('connection', (socket) => {
     io.to(codeBlockId).emit('updateStudentCount', studentCounts[codeBlockId]);
 
     socket.on('codeChange', async (newCode) => {
-      await CodeBlock.updateOne({ blockId: codeBlockId }, { code: newCode });
-
-      // Normalize both newCode and solution by removing all extra spaces but ensuring at least one space between keywords
-      const normalizeCode = (code) => code.replace(/function\s+/g, 'function ').replace(/\s+/g, '').toLowerCase();
-      const normalizedNewCode = normalizeCode(newCode);
-      const normalizedSolution = normalizeCode(codeBlock.solution);
-
-      console.log('Normalized newCode:', normalizedNewCode);
-      console.log('Normalized solution:', normalizedSolution);
-
-      if (normalizedNewCode === normalizedSolution) {
-        console.log('Solution matched!');
-        io.to(codeBlockId).emit('solutionMatched');
-      } else {
-        console.log('No match yet.');
-      }
-
-      io.to(codeBlockId).emit('codeUpdate', newCode);
-    });
+        await CodeBlock.updateOne({ blockId: codeBlockId }, { code: newCode });
+      
+        // Normalize both newCode and solution by removing all spaces and converting to lowercase
+        const normalizedNewCode = newCode.replace(/\s+/g, '').toLowerCase();
+        const normalizedSolution = codeBlock.solution.replace(/\s+/g, '').toLowerCase();
+      
+        console.log('Normalized newCode:', normalizedNewCode);
+        console.log('Normalized solution:', normalizedSolution);
+      
+        if (normalizedNewCode === normalizedSolution) {
+          console.log('Solution matched!');
+          io.to(codeBlockId).emit('solutionMatched');
+        } else {
+          console.log('No match yet.');
+        }
+      
+        io.to(codeBlockId).emit('codeUpdate', newCode);
+      });
+      
 
     socket.on('disconnect', async () => {
       console.log('A user disconnected:', socket.id);
@@ -131,7 +113,6 @@ io.on('connection', (socket) => {
   });
 });
 
-// API to fetch code blocks
 app.get('/api/codeblocks', async (req, res) => {
   try {
     const codeBlocks = await CodeBlock.find({});
@@ -141,8 +122,6 @@ app.get('/api/codeblocks', async (req, res) => {
   }
 });
 
-// Start server
-const PORT = process.env.PORT || 8080;
 server.listen(3001, () => {
   console.log('Server is running on port 3001');
 });
