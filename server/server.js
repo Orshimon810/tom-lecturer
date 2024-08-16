@@ -8,21 +8,11 @@ const CodeBlock = require('./models/CodeBlock');
 
 const app = express();
 const server = http.createServer(app);
-const port = process.env.PORT || 3001;
 
-const path = require('path');
-
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'client/build')));
-
-// The "catchall" handler: for any request that doesn't match one above, send back index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
-});
 
 
 app.use(cors({
-  origin: `${process.env.REACT_APP_BACKEND_URL}`,
+  origin: 'http://localhost:3000',
   methods: ['GET', 'POST'],
   credentials: true,
 }));
@@ -38,7 +28,7 @@ mongoose.connect(process.env.MONGO_URI)
 
   const io = new Server(server, {
     cors: {
-      origin: `${process.env.REACT_APP_BACKEND_URL}`, 
+      origin: 'http://localhost:3000',
       methods: ['GET', 'POST'],
       credentials: true,
     },
@@ -134,6 +124,6 @@ app.get('/api/codeblocks', async (req, res) => {
   }
 });
 
-server.listen(port, () => {
+server.listen(3001, () => {
   console.log('Server is running on port 3001');
 });

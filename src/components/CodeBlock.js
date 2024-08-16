@@ -22,7 +22,7 @@ const CodeBlock = () => {
   const socketRef = React.useRef(null);
 
   useEffect(() => {
-    const socket = io(`${process.env.REACT_APP_BACKEND_URL}`, {
+    const socket = io('http://localhost:3001', {
       reconnectionAttempts: 5,
       timeout: 20000,
     });
