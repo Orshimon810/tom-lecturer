@@ -14,13 +14,13 @@ app.use(express.static(path.join(__dirname, '../build')));
 
 
 app.use(cors({
-  origin: `${process.env.REACT_APP_FRONTEND_URL}`,
+  origin: process.env.REACT_APP_FRONTEND_URL,
   methods: ['GET', 'POST'],
   credentials: true,
 }));
 
 
-mongoose.connect('mongodb+srv://orshimondev:mPuSOoRvhMOeNwAQ@jslecturer.isjqr.mongodb.net/jslecturer')
+mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
     console.log('Connected to MongoDB Atlas');
   })
@@ -30,7 +30,7 @@ mongoose.connect('mongodb+srv://orshimondev:mPuSOoRvhMOeNwAQ@jslecturer.isjqr.mo
 
   const io = new Server(server, {
     cors: {
-      origin: `${process.env.REACT_APP_FRONTEND_URL}`,
+      origin: process.env.REACT_APP_FRONTEND_URL,
       methods: ['GET', 'POST'],
       credentials: true,
     },
