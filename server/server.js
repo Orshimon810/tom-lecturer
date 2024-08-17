@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, '../build')));
 
 
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: `${process.env.REACT_APP_FRONTEND_URL}`,
   methods: ['GET', 'POST'],
   credentials: true,
 }));
@@ -30,7 +30,7 @@ mongoose.connect('mongodb+srv://orshimondev:mPuSOoRvhMOeNwAQ@jslecturer.isjqr.mo
 
   const io = new Server(server, {
     cors: {
-      origin: 'http://localhost:3000',
+      origin: `${process.env.REACT_APP_FRONTEND_URL}`,
       methods: ['GET', 'POST'],
       credentials: true,
     },
