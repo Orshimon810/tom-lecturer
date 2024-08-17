@@ -9,6 +9,8 @@ const CodeBlock = require('./models/CodeBlock');
 const app = express();
 const server = http.createServer(app);
 
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../build')));
 
 
 app.use(cors({
@@ -122,6 +124,11 @@ app.get('/api/codeblocks', async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Error fetching code blocks' });
   }
+});
+
+// Handles any requests that don't match the ones above
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../build/index.html'));
 });
 
 server.listen(3001, () => {
