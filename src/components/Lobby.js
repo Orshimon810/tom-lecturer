@@ -9,7 +9,7 @@ const Lobby = () => {
   useEffect(() => {
     const fetchCodeBlocks = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/codeblocks');
+        const response = await fetch('https://jslecturer-639a06a0d162.herokuapp.com/api/codeblocks');
         const data = await response.json();
         setCodeBlocks(data);
       } catch (error) {
